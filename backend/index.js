@@ -9,19 +9,25 @@ const ensureAuthenticated = require('./Middlewares/Auth');
 
 require('dotenv').config();
 require('./Models/db');
-const PORT = process.env.PORT || 8080;
+
+// Middleware
+app.use(bodyParser.json());
+app.use(cors());
+
+// Root route (important for Vercel)
+app.get('/', (req, res) => {
+    res.send('Backend is working! 🚀');
+});
 
 app.get('/ping', (req, res) => {
     res.send('PONG');
 });
 
-app.use(bodyParser.json());
-app.use(cors());
+// Routes
 app.use('/auth', AuthRouter);
 app.use('/products', ProductRouter);
-app.use('/expenses', ensureAuthenticated, ExpenseRouter)
+app.use('/expenses', ensureAuthenticated, ExpenseRouter);
 
-
-app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`)
-})
+// ❌ Do not use app.listen() on Vercel
+// ✅ Instead, export the app
+module.exports = app;
